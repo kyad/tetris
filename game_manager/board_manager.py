@@ -117,6 +117,8 @@ class BoardData(object):
         self.obstacle_probability = 0
         self.random_seed = 0
         self.nextShapeIndexCnt = 1
+        self.block_order = 0
+        self.count = 0
 
     def init_randomseed(self, num):
         self.random_seed = int(num % (2**32-1))
@@ -127,6 +129,9 @@ class BoardData(object):
     def init_obstacle_parameter(self, height, probability):
         self.obstacle_height = height
         self.obstacle_probability = probability
+
+    def init_block_order(self, block_order):
+        self.block_order = block_order
 
     def getData(self):
         return self.backBoard[:]
@@ -149,15 +154,25 @@ class BoardData(object):
         return self.currentShape.getCoords(self.currentDirection, self.currentX, self.currentY)
 
     def getNewShapeIndex(self):
-        if self.random_seed == 0:
-            # static value
-            nextShapeIndex = self.nextShapeIndexCnt
-            self.nextShapeIndexCnt += 1
-            if self.nextShapeIndexCnt >= (7+1):
-                self.nextShapeIndexCnt = 1
+        if self.block_order == 0:
+            if self.random_seed == 0:
+                # static value
+                nextShapeIndex = self.nextShapeIndexCnt
+                self.nextShapeIndexCnt += 1
+                if self.nextShapeIndexCnt >= (7+1):
+                    self.nextShapeIndexCnt = 1
+            else:
+                # random value
+                nextShapeIndex = np_randomShape.random.randint(1, 7)
+        elif self.block_order == 2:
+            self.count += 1
+            order = (
+                Shape.shapeI, Shape.shapeL, Shape.shapeJ, Shape.shapeT, Shape.shapeO, Shape.shapeS, Shape.shapeZ,
+                Shape.shapeI, Shape.shapeL, Shape.shapeJ, Shape.shapeO, Shape.shapeS, Shape.shapeZ, Shape.shapeT,
+            )
+            nextShapeIndex = order[self.count % len(order)]
         else:
-            # random value
-            nextShapeIndex = np_randomShape.random.randint(1, 8)
+            raise ValueError()
         return nextShapeIndex
 
     def createNewPiece(self):

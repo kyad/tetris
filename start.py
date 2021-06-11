@@ -76,6 +76,7 @@ def start():
     RANDOM_SEED = 0            # random seed for field
     OBSTACLE_HEIGHT = 0        # obstacle height (blocks)
     OBSTACLE_PROBABILITY = 0   # obstacle probability (percent)
+    BLOCK_ORDER = 0
 
     ## update field parameter level
     if GAME_LEVEL == 0:   # level0
@@ -88,6 +89,8 @@ def start():
         RANDOM_SEED = -1
         OBSTACLE_HEIGHT = 10
         OBSTACLE_PROBABILITY = 40
+    elif GAME_LEVEL == 777: # forever
+        BLOCK_ORDER = 2
     else:
         print('invalid level: ' + str(GAME_LEVEL), file=sys.stderr)
         sys.exit(1)
@@ -105,6 +108,7 @@ def start():
     print('OBSTACLE_PROBABILITY: ' + str(OBSTACLE_PROBABILITY))
     print('USER_NAME: ' + str(USER_NAME))
     print('RESULT_LOG_JSON: ' + str(RESULT_LOG_JSON))
+    print('BLOCK_ORDER: ' + str(BLOCK_ORDER))
 
     ## start game
     PYTHON_CMD = get_python_cmd()
@@ -116,7 +120,8 @@ def start():
         + ' ' + '--drop_interval' + ' ' + str(DROP_INTERVAL) \
         + ' ' + '--mode' + ' ' + str(IS_MODE) \
         + ' ' + '--user_name' + ' ' + str(USER_NAME) \
-        + ' ' + '--resultlogjson' + ' ' + str(RESULT_LOG_JSON)
+        + ' ' + '--resultlogjson' + ' ' + str(RESULT_LOG_JSON) \
+        + ' ' + '--block_order' + ' ' + str(BLOCK_ORDER)
 
     ret = subprocess.run(cmd, shell=True)
     if ret.returncode != 0:

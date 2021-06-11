@@ -41,6 +41,9 @@ def get_option(game_time, mode, drop_interval, random_seed, obstacle_height, obs
     argparser.add_argument('-u', '--user_name', type=str,
                            default=user_name,
                            help='Specigy user name if necessary')
+    argparser.add_argument('--block_order', type=int,
+                           default=0,
+                           help='Specify block order. 0=static/random 2=special')
     return argparser.parse_args()
 
 class Game_Manager(QMainWindow):
@@ -92,6 +95,7 @@ class Game_Manager(QMainWindow):
             self.resultlogjson = args.resultlogjson
         if len(args.user_name) != 0:
             self.user_name = args.user_name
+        self.block_order = args.block_order
         self.initUI()
 
     def initUI(self):
@@ -108,7 +112,8 @@ class Game_Manager(QMainWindow):
                             self.game_time,
                             random_seed_Nextshape,
                             self.obstacle_height,
-                            self.obstacle_probability)
+                            self.obstacle_probability,
+                            self.block_order)
         hLayout.addWidget(self.tboard)
 
         self.sidePanel = SidePanel(self, self.gridSize)
@@ -630,11 +635,12 @@ class SidePanel(QFrame):
 class Board(QFrame):
     msg2Statusbar = pyqtSignal(str)
 
-    def __init__(self, parent, gridSize, game_time, random_seed, obstacle_height, obstacle_probability):
+    def __init__(self, parent, gridSize, game_time, random_seed, obstacle_height, obstacle_probability, block_order):
         super().__init__(parent)
         self.setFixedSize(gridSize * BOARD_DATA.width, gridSize * BOARD_DATA.height)
         self.gridSize = gridSize
         self.game_time = game_time
+        self.block_order = block_order
         self.initBoard(random_seed, obstacle_height, obstacle_probability)
 
     def initBoard(self, random_seed_Nextshape, obstacle_height, obstacle_probability):
@@ -648,6 +654,7 @@ class Board(QFrame):
         BOARD_DATA.clear()
         BOARD_DATA.init_randomseed(random_seed_Nextshape)
         BOARD_DATA.init_obstacle_parameter(obstacle_height, obstacle_probability)
+        BOARD_DATA.init_block_order(self.block_order)
 
     def paintEvent(self, event):
         painter = QPainter(self)
